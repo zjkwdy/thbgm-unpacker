@@ -8,7 +8,7 @@ T_Bgm = dict[str, int]
 
 
 class thbgm:
-    #定义见#45
+    # 定义见#45
     bgm: T_Bgm
     name: str
     startTime: int
@@ -40,16 +40,17 @@ class thfmt:
         f.seek(0, 2)  # 指针移到末尾
         size = f.tell()
         f.seek(0)
-        #循环读取直到结束，每首52字节（十六进制编辑器数出来的，也不知道是不是字节）
+        # 循环读取直到结束，每首52字节（十六进制编辑器数出来的，也不知道是不是字节）
         while f.tell() < size:
             bgm = f.read(52)
             if len(bgm) == 52:
                 fileName = bgm[:16].replace(b'\x00', b'').decode('utf-8')
-                #文档来自网络，都要小端序排列
-                startTime = int.from_bytes(bgm[16:20], 'little')#bgm开始偏移量
-                duration = int.from_bytes(bgm[20:24], 'little')#bgm时长（大——概——吧——）
-                loopStart = int.from_bytes(bgm[24:28], 'little')#循环节开始
-                loopDuration = int.from_bytes(bgm[28:32], 'little')#循环长度
+                # 文档来自网络，都要小端序排列
+                startTime = int.from_bytes(bgm[16:20], 'little')  # bgm开始偏移量
+                duration = int.from_bytes(
+                    bgm[20:24], 'little')  # bgm时长（大——概——吧——）
+                loopStart = int.from_bytes(bgm[24:28], 'little')  # 循环节开始
+                loopDuration = int.from_bytes(bgm[28:32], 'little')  # 循环长度
                 bgm = {
                     'name': fileName,
                     'duration': duration,
@@ -63,24 +64,33 @@ class thfmt:
     def close(self) -> None:
         self.fmt.close()
 
+# 继承重写配置文件类，使其支持大写。。
 
 
-config = RawConfigParser()
+class myconf(RawConfigParser):
+    def __init__(self, defaults=None):
+        RawConfigParser.__init__(self, defaults=None)
+
+    def optionxform(self, optionstr):
+        return optionstr
+
+
+config = myconf()
 # 铁打的原作参数
 config.add_section('THBGM')
-#thbgm.dat文件位置
+# thbgm.dat文件位置
 config.set('THBGM', 'PATH', 'thbgm.dat')
-#采样率，正作祖传44100
+# 采样率，正作祖传44100
 config.set('THBGM', 'SAMPLE', '44100')
-#双声道
+# 双声道
 config.set('THBGM', 'CHANNEL', '2')
-#16bit位宽
+# 16bit位宽
 config.set('THBGM', 'BIT', '16')
 
-#打开bgm.fmt,初始化
+# 打开bgm.fmt,初始化
 fmt = thfmt('thbgm.fmt')
 with open('BgmForAll.ini', 'w+') as ini:
-    #写入死参数
+    # 写入死参数
     config.write(ini)
     for bgm in fmt.bgmList:
         nE = bgm.name
@@ -94,5 +104,5 @@ with open('BgmForAll.ini', 'w+') as ini:
         print(bgm)
         ini.write(bgm)
 
-#经典无用代码
+# 经典无用代码
 fmt.close()
