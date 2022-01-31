@@ -1,11 +1,12 @@
+#!/usr/bin/env python3
 from os.path import exists
 from io import BufferedReader
 from configparser import RawConfigParser
-
+from argparse import ArgumentParser
 
 T_Bgm = dict[str, int]
 
-
+#单首bgm的类型
 class thbgm:
     # 定义见#45
     bgm: T_Bgm
@@ -22,7 +23,7 @@ class thbgm:
         self.loopSart = bgm['loopStart']
         self.loopDuration = bgm['loopDuration']
 
-
+#thbgm.fmt处理类
 class thfmt:
 
     fmt: BufferedReader
@@ -62,14 +63,15 @@ class thfmt:
     def close(self) -> None:
         self.fmt.close()
 
-
+#thbgm.dat处理类
 class bgmdat:
 
     dat: BufferedReader
-
+    name: str
     def __init__(self, fileName='thbgm.dat') -> None:
         if not exists(fileName):
             raise FileNotFoundError(f'找不到{fileName},退出...')
+        self.name = fileName
         self.dat = open(fileName, 'rb')
 
     def close(self) -> None:
@@ -81,7 +83,7 @@ class bgmdat:
     def read(self, size) -> bytes:
         return self.dat.read(size)
 
-
+#wav生成和处理类
 class riff:
     # riff header
     RIFF_HEADER = b'\x52\x49\x46\x46'  # RIFF
@@ -135,11 +137,23 @@ class myconf(RawConfigParser):
         return optionstr
 
 
+arg_parser = ArgumentParser()
+arg_parser.add_argument('-f','--fmt',help='thbgm.fmt文件名(路径)')
+arg_parser.add_argument('-d','--dat',help='thbgm.dat文件名(路径)')
+
+args=arg_parser.parse_args()
+fmtName=args.fmt if args.fmt else 'thbgm.fmt'
+datName=args.dat if args.dat else 'thbgm.dat'
+# 打开bgm.fmt,初始化
+fmt = thfmt(fmtName)
+# 打开bgm.dat,初始化
+dat = bgmdat(datName)
+#初始化ini
 config = myconf()
 # 铁打的原作参数
 config.add_section('THBGM')
 # thbgm.dat文件位置
-config.set('THBGM', 'PATH', 'thbgm.dat')
+config.set('THBGM', 'PATH', dat.name)
 # 采样率，正作祖传44100
 config.set('THBGM', 'SAMPLE', '44100')
 # 双声道
@@ -147,9 +161,7 @@ config.set('THBGM', 'CHANNEL', '2')
 # 16bit位宽
 config.set('THBGM', 'BIT', '16')
 
-# 打开bgm.fmt,初始化
-fmt = thfmt('thbgm.fmt')
-dat = bgmdat('thbgm.dat')
+
 with open('BgmForAll.ini', 'w+') as ini:
     # 写入死参数
     config.write(ini)
@@ -173,3 +185,4 @@ with open('BgmForAll.ini', 'w+') as ini:
 
 # 经典无用代码
 fmt.close()
+dat.close()
