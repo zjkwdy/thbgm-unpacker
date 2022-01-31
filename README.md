@@ -1,7 +1,7 @@
 # THBGM-UNPack
 
 
-![license](https://img.shields.io/github/license/zjkwdy/thbgm-unpack)  |  ![pyver](https://img.shields.io/badge/python-3.7+-green)
+![license](https://img.shields.io/github/license/zjkwdy/thbgm-unpack)    ![pyver](https://img.shields.io/badge/python-3.7+-green)
 
 
 一个用来提取东方正作bgm的脚本，顺便可以生成`BgmForAll.ini`。懒得测试那么多了，目前就测试了
@@ -23,7 +23,7 @@ python3 thbgm.py -W
 
 ##### 可选参数：
 
-```shell
+```
 usage: thbgm.py [-h] [-f FMT] [-d DAT] [-l] [-W] [-I]
 
 options:
@@ -45,7 +45,7 @@ https://github.com/thpatch/thtk
 
 #### 什么？你都看到这里了还不会用thtk解压thxx.dat?
 
-```shell
+```
 Usage: thdat [-V] [[-c | -l | -x] 正作版本号] [dat文件 [文件名...]]
 Options:
   -c  生成dat
