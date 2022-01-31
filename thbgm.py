@@ -186,7 +186,7 @@ if lsMode:
     print('Name'.center(15,'-')+'Size'.center(10,'-')+'Offset'.center(13,'-'))
 for bgm in fmt.bgmList:
     if lsMode:
-        print(bgm.name.ljust(15),str(hum_convert(bgm.loopDuration)).ljust(10),hex(bgm.startTime).ljust(10))
+        print(bgm.name.ljust(15),str(hum_convert(bgm.loopDuration)).ljust(10),hex(bgm.startTime).upper().ljust(10).replace('0X','0x'))
     if wavMode:
         if not lsMode: print(bgm.name)
         dat.seek(bgm.startTime)
