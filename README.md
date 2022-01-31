@@ -1,5 +1,7 @@
 # THBGM-UNPack
-<center>![license](https://img.shields.io/github/license/zjkwdy/thbgm-unpack)  ![pyver](https://img.shields.io/badge/python-3.7+-green)</center>
+<center>
+![license](https://img.shields.io/github/license/zjkwdy/thbgm-unpack)  | ![pyver](https://img.shields.io/badge/python-3.7+-green)
+</center>
 一个用来提取东方正作bgm的脚本，顺便可以生成`BgmForAll.ini`。懒得测试那么多了，目前就测试了
 
 th07-妖妖梦、th12-星莲船、th14-辉针城
