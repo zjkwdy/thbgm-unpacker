@@ -13,19 +13,26 @@ th07-妖妖梦、th12-星莲船、th14-辉针城
 首先使用`thtk`解压出`thbgm.fmt`，放在跟脚本同一个目录。
 然后把正作文件夹内`thbgm.dat`也放到跟脚本同一个目录。
 
-然后就可以运行这个脚本了```python3 thbgm.py```
+然后就可以运行这个脚本了
 
-不出意外的话会生成一大堆wav和一个`BgmForAll.ini`。
+```shell
+python3 thbgm.py -W
+```
+
+不出意外的话会生成一大堆wav。
 
 ##### 可选参数：
 
 ```shell
-Usage: thbgm.py [-h] [-f FMT] [-d DAT]
+usage: thbgm.py [-h] [-f FMT] [-d DAT] [-l] [-W] [-I]
 
-选项:
+options:
   -h, --help         显示这个帮助页然后退出
-  -f FMT, --fmt FMT  thbgm.fmt文件名
-  -d DAT, --dat DAT  thbgm.dat文件名
+  -f FMT, --fmt FMT  thbgm.fmt文件名(路径)
+  -d DAT, --dat DAT  thbgm.dat文件名(路径)
+  -l, --ls           列出fmt内所有bgm
+  -W, --wav          解压wav
+  -I, --ini          生成BgmForAll.ini
 ```
 
 注释都在`thbgm.py`，自己看吧。没什么技术含量。

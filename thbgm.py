@@ -6,7 +6,16 @@ from argparse import ArgumentParser
 
 T_Bgm = dict[str, int]
 
-#单首bgm的类型
+#将字节数转为MB等单位
+def hum_convert(value):
+    units = ["B", "KB", "MB", "GB", "TB", "PB"]
+    size = 1024.0
+    for i in range(len(units)):
+        if (value / size) < 1:
+            return "%.2f%s" % (value, units[i])
+        value = value / size
+
+# 单首bgm的类型
 class thbgm:
     # 定义见#45
     bgm: T_Bgm
@@ -23,7 +32,7 @@ class thbgm:
         self.loopSart = bgm['loopStart']
         self.loopDuration = bgm['loopDuration']
 
-#thbgm.fmt处理类
+# thbgm.fmt处理类
 class thfmt:
 
     fmt: BufferedReader
@@ -63,11 +72,12 @@ class thfmt:
     def close(self) -> None:
         self.fmt.close()
 
-#thbgm.dat处理类
+# thbgm.dat处理类
 class bgmdat:
 
     dat: BufferedReader
     name: str
+
     def __init__(self, fileName='thbgm.dat') -> None:
         if not exists(fileName):
             raise FileNotFoundError(f'找不到{fileName},退出...')
@@ -78,12 +88,12 @@ class bgmdat:
         self.dat.close()
 
     def seek(self, postion: int) -> int:
-        return self.dat.seek(postion,0)
+        return self.dat.seek(postion, 0)
 
     def read(self, size) -> bytes:
         return self.dat.read(size)
 
-#wav生成和处理类
+# wav生成和处理类
 class riff:
     # riff header
     RIFF_HEADER = b'\x52\x49\x46\x46'  # RIFF
@@ -138,50 +148,59 @@ class myconf(RawConfigParser):
 
 
 arg_parser = ArgumentParser()
-arg_parser.add_argument('-f','--fmt',help='thbgm.fmt文件名(路径)')
-arg_parser.add_argument('-d','--dat',help='thbgm.dat文件名(路径)')
+arg_parser.add_argument('-f', '--fmt', help='thbgm.fmt文件名(路径)')
+arg_parser.add_argument('-d', '--dat', help='thbgm.dat文件名(路径)')
+arg_parser.add_argument('-l', '--ls', help='列出fmt内所有bgm',action='store_true')
+arg_parser.add_argument('-W', '--wav', help='解压wav',action='store_true')
+arg_parser.add_argument('-I', '--ini', help='生成BgmForAll.ini',action='store_true')
 
-args=arg_parser.parse_args()
-fmtName=args.fmt if args.fmt else 'thbgm.fmt'
-datName=args.dat if args.dat else 'thbgm.dat'
+args = arg_parser.parse_args()
+fmtName = args.fmt if args.fmt else 'thbgm.fmt'
+datName = args.dat if args.dat else 'thbgm.dat'
+lsMode = True if args.ls else False
+iniMode = True if args.ini else False
+wavMode = True if args.wav else False
+
 # 打开bgm.fmt,初始化
 fmt = thfmt(fmtName)
 # 打开bgm.dat,初始化
 dat = bgmdat(datName)
-#初始化ini
-config = myconf()
-# 铁打的原作参数
-config.add_section('THBGM')
-# thbgm.dat文件位置
-config.set('THBGM', 'PATH', dat.name)
-# 采样率，正作祖传44100
-config.set('THBGM', 'SAMPLE', '44100')
-# 双声道
-config.set('THBGM', 'CHANNEL', '2')
-# 16bit位宽
-config.set('THBGM', 'BIT', '16')
-
-
-with open('BgmForAll.ini', 'w+') as ini:
+if iniMode:
+    # 初始化ini
+    config = myconf()
+    # 铁打的原作参数
+    config.add_section('THBGM')
+    # thbgm.dat文件位置
+    config.set('THBGM', 'PATH', dat.name)
+    # 采样率，正作祖传44100
+    config.set('THBGM', 'SAMPLE', '44100')
+    # 双声道
+    config.set('THBGM', 'CHANNEL', '2')
+    # 16bit位宽
+    config.set('THBGM', 'BIT', '16')
+    iniFile = open('BgmForAll.ini', 'w+')
     # 写入死参数
-    config.write(ini)
-    for bgm in fmt.bgmList:
-        nE = bgm.name
+    config.write(iniFile)
+
+if lsMode:
+    print('Name'.center(20),'Size'.center(10))
+for bgm in fmt.bgmList:
+    if lsMode:
+        print(bgm.name.center(20),str(hum_convert(bgm.loopDuration)).center(10))
+    if wavMode:
+        print(bgm.name)
+        dat.seek(bgm.startTime)
+        byte = dat.read(bgm.loopDuration)
+        wav = riff(byte)
+        wav.save(bgm.name)
+    if iniMode:
         sT = hex(bgm.startTime)
         lS = hex(bgm.loopSart)
         x1 = hex(bgm.startTime+bgm.loopSart)
         x2 = hex(bgm.loopDuration-bgm.loopSart)
-        print(nE)
-        dat.seek(bgm.startTime)
-        byte=dat.read(bgm.loopDuration)
-        wav=riff(byte)
-        wav.save(nE)
-        bgm = 'BGM = %s,%s,%s,%s,%s\n' % (nE, sT, lS, x1, x2)
-
-        bgm = bgm.upper().replace('0X', '0x')
-        # print(bgm)
-
-        ini.write(bgm)
+        bgm_ini = 'BGM = %s,%s,%s,%s,%s\n' % (bgm.name, sT, lS, x1, x2)
+        bgm_ini = bgm_ini.upper().replace('0X', '0x')
+        iniFile.write(bgm_ini)
 
 # 经典无用代码
 fmt.close()
