@@ -183,12 +183,12 @@ if iniMode:
     config.write(iniFile)
 
 if lsMode:
-    print('Name'.center(20),'Size'.center(10))
+    print('Name'.center(15,'-')+'Size'.center(10,'-')+'Offset'.center(13,'-'))
 for bgm in fmt.bgmList:
     if lsMode:
-        print(bgm.name.center(20),str(hum_convert(bgm.loopDuration)).center(10))
+        print(bgm.name.ljust(15),str(hum_convert(bgm.loopDuration)).ljust(10),hex(bgm.startTime).ljust(10))
     if wavMode:
-        print(bgm.name)
+        if not lsMode: print(bgm.name)
         dat.seek(bgm.startTime)
         byte = dat.read(bgm.loopDuration)
         wav = riff(byte)
