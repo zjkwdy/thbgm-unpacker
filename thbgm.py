@@ -3,6 +3,7 @@ from os.path import exists,getsize
 from io import BufferedReader
 from configparser import RawConfigParser
 from argparse import ArgumentParser
+from pyaudio import PyAudio
 import wave
 
 T_Bgm = dict[str, int]
@@ -163,6 +164,7 @@ class myconf(RawConfigParser):
 arg_parser = ArgumentParser()
 arg_parser.add_argument('-f', '--fmt', help='thbgm.fmt文件名(路径)')
 arg_parser.add_argument('-d', '--dat', help='thbgm.dat文件名(路径)')
+arg_parser.add_argument('-F', '--file', help='解包指定的文件',nargs='+')
 arg_parser.add_argument('-L', '--loop', help='指定循环部分循环次数（WAV模式）',type=int)
 arg_parser.add_argument('-l', '--ls', help='列出fmt内所有bgm',action='store_true')
 arg_parser.add_argument('-W', '--wav', help='解包wav',action='store_true')
@@ -175,6 +177,7 @@ lsMode = True if args.ls else False
 iniMode = True if args.ini else False
 wavMode = True if args.wav else False
 loopMode = True if args.loop else False
+fileMode = True if args.file else False
 
 print('THBGM-UNPack v1.03.2')
 print('Copyright © 2022 zjkwdy.All rights reserved.')
@@ -204,6 +207,7 @@ if lsMode:
     total=fmt.bgmList[0].startTime
     print('Name'.center(15,'-')+'Size'.center(10,'-')+'Offset'.center(13,'-'))
 for bgm in fmt.bgmList:
+    if fileMode and (bgm.name not in args.file): continue
     if lsMode:
         print(bgm.name.ljust(15),str(hum_convert(bgm.loopDuration)).ljust(10),hex(bgm.startTime).upper().ljust(10).replace('0X','0x'))
         total+=bgm.loopDuration
