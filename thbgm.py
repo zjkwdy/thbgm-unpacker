@@ -162,13 +162,13 @@ class myconf(RawConfigParser):
 
 
 arg_parser = ArgumentParser()
-arg_parser.add_argument('-f', '--fmt', help='thbgm.fmt文件名(路径)')
-arg_parser.add_argument('-d', '--dat', help='thbgm.dat文件名(路径)')
-arg_parser.add_argument('-F', '--file', help='解包指定的文件',nargs='+')
-arg_parser.add_argument('-L', '--loop', help='指定循环部分循环次数（WAV模式）',type=int)
-arg_parser.add_argument('-l', '--ls', help='列出fmt内所有bgm',action='store_true')
-arg_parser.add_argument('-W', '--wav', help='解包wav',action='store_true')
-arg_parser.add_argument('-I', '--ini', help='生成BgmForAll.ini',action='store_true')
+arg_parser.add_argument('-f', '--fmt', help='thbgm.fmt文件名(路径)', metavar='File')
+arg_parser.add_argument('-d', '--dat', help='thbgm.dat文件名(路径)', metavar='File')
+arg_parser.add_argument('-F', '--file', help='解包指定的文件', nargs='+', metavar='File')
+arg_parser.add_argument('-L', '--loop', help='指定循环部分循环次数（WAV模式）', type=int, metavar='Number')
+arg_parser.add_argument('-l', '--ls', help='列出fmt内所有bgm', action='store_true')
+arg_parser.add_argument('-W', '--wav', help='解包wav', action='store_true')
+arg_parser.add_argument('-I', '--ini', help='生成BgmForAll.ini', action='store_true')
 
 args = arg_parser.parse_args()
 fmtName = args.fmt if args.fmt else 'thbgm.fmt'
