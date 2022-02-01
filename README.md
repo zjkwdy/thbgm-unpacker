@@ -25,25 +25,52 @@ python3 thbgm.py -W
 
 ```
 $> ./thbgm.py -h
-usage: thbgm.py [-h] [-f FMT] [-d DAT] [-L LOOP] [-l] [-W] [-I]
+usage: thbgm.py [-h] [-f File] [-d File] [-F File [File ...]] [-L Number] [-l] [-W] [-I]
 
 options:
   -h, --help            show this help message and exit
-  -f FMT, --fmt FMT     thbgm.fmt文件名(路径)
-  -d DAT, --dat DAT     thbgm.dat文件名(路径)
-  -L LOOP, --loop LOOP  指定循环部分循环次数（WAV模式）
+  -f File, --fmt File   thbgm.fmt文件名(路径)
+  -d File, --dat File   thbgm.dat文件名(路径)
+  -F File [File ...], --file File [File ...] 
+  						解包指定的文件
+  -L Number, --loop Number
+  						指定循环部分循环次数（WAV模式）
   -l, --ls              列出fmt内所有bgm
   -W, --wav             解包wav
   -I, --ini             生成BgmForAll.ini
 ```
 
+指定`thbgm.dat`和`thbgm.fmt`文件名（默认为`thbgm.dat`和`thbgm.fmt`）
+
+```shell
+./thbgm.py -f th12bgm.fmt -d th12bgm.dat -W
+```
+
+列出`th12bgm.fmt`和`th12bgm.dat`内的文件
+
+```shell
+./thbgm.py -l
+```
+
+只解包（解析）某一（几）首bgm:
+
+```shell
+./thbgm.py -F th12_00.wav th12_01.wav -W
+```
+
+指定循环部分循环次数：
+
+```shell
+./thbgm.py -L 3
+```
+
 多个参数可以同时使用：
 
 ```shell
-./thbgm.py -f th12bgm.fmt -d th12bgm.dat -lWI -L 3
+./thbgm.py -f th12bgm.fmt -d th12bgm.dat -lWI -F th12_01.wav -L 3
 ```
 
-执行后将会显示fmt内指示的所有bgm，并且在本目录下解包出一大堆循环部分循环3次的wav，同时生成`BgmForAll.ini`。
+执行后将会显示fmt内指示的所有bgm，并且在本目录下解包出循环部分循环3次的`th12_01.wav`，同时生成`BgmForAll.ini`。
 
 注释都在`thbgm.py`，自己看吧。没什么技术含量。
 
