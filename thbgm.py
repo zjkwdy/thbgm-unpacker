@@ -212,7 +212,6 @@ for bgm in fmt.bgmList:
         print(bgm.name.ljust(15),str(hum_convert(bgm.loopDuration)).ljust(10),hex(bgm.startTime).upper().ljust(10).replace('0X','0x'))
         total+=bgm.loopDuration
     if wavMode:
-        if not lsMode: print(bgm.name)
         dat.seek(bgm.startTime)
         byte = dat.read(bgm.loopDuration)
         if loopMode and args.loop>1:
@@ -222,6 +221,7 @@ for bgm in fmt.bgmList:
             byte = byte + loopBytes*loopNum
         wav = riff(byte)
         wav.save(bgm.name)
+        if not lsMode: print(bgm.name)
     if iniMode:
         sT = hex(bgm.startTime)
         lS = hex(bgm.loopSart)
@@ -230,6 +230,7 @@ for bgm in fmt.bgmList:
         bgm_ini = 'BGM = %s,%s,%s,%s,%s\n' % (bgm.name, sT, lS, x1, x2)
         bgm_ini = bgm_ini.upper().replace('0X', '0x')
         iniFile.write(bgm_ini)
+        if not lsMode: print(bgm.name)
 
 if lsMode:
     print(''.center(38,'-'))
