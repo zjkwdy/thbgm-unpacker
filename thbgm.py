@@ -3,6 +3,7 @@ from os.path import exists,getsize
 from io import BufferedReader
 from configparser import RawConfigParser
 from argparse import ArgumentParser
+import wave
 
 T_Bgm = dict[str, int]
 
@@ -95,47 +96,59 @@ class bgmdat:
 
 # wav生成和处理类
 class riff:
-    # riff header
-    RIFF_HEADER = b'\x52\x49\x46\x46'  # RIFF
-    riff_size = b'\x00\x00\x00\x00'  # 4字节的数据长度
-    WAVE = b'\x57\x41\x56\x45'
+    # # riff header
+    # RIFF_HEADER = b'\x52\x49\x46\x46'  # RIFF
+    # riff_size = b'\x00\x00\x00\x00'  # 4字节的数据长度
+    # WAVE = b'\x57\x41\x56\x45'
 
-    # fmt chunk start
-    FMT = b'\x66\x6d\x74\x20'  # fmt
-    PCM_FMT = b'\x10\x00\x00\x00'
-    COMPRESS = b'\x01\x00'
-    CHANNELS = b'\x02\x00'
-    SAMPLE = b'\x44\xac\x00\x00'  # 44100采样率
-    BYTE_RATE = b'\x10\xb1\x02\x00'
-    BLOCK_ALIGN = b'\x04\x00'
-    SAMPLE_DEPTH = b'\x10\x00'
+    # # fmt chunk start
+    # FMT = b'\x66\x6d\x74\x20'  # fmt
+    # PCM_FMT = b'\x10\x00\x00\x00'
+    # COMPRESS = b'\x01\x00'
+    # CHANNELS = b'\x02\x00'
+    # SAMPLE = b'\x44\xac\x00\x00'  # 44100采样率
+    # BYTE_RATE = b'\x10\xb1\x02\x00'
+    # BLOCK_ALIGN = b'\x04\x00'
+    # SAMPLE_DEPTH = b'\x10\x00'
 
-    # data chunk start
-    DATA_HEADER = b'\x64\x61\x74\x61'  # 'data'
-    DATA_SIZE = b'\x00\x00\x00\x00'
-    DATA = b'\x00\x00\x00\x00'
+    # # data chunk start
+    # DATA_HEADER = b'\x64\x61\x74\x61'  # 'data'
+    # DATA_SIZE = b'\x00\x00\x00\x00'
+    # DATA = b'\x00\x00\x00\x00'
 
-    BYTESDATA = [
-        RIFF_HEADER, riff_size, WAVE,  # RIFF CHUNK
-        FMT, PCM_FMT, COMPRESS, CHANNELS, SAMPLE, BYTE_RATE, BLOCK_ALIGN, SAMPLE_DEPTH,  # FMT CHUNK
-        DATA_HEADER, DATA_SIZE, DATA  # DATA CHUNK
-    ]
+    # BYTESDATA = [
+    #     RIFF_HEADER, riff_size, WAVE,  # RIFF CHUNK
+    #     FMT, PCM_FMT, COMPRESS, CHANNELS, SAMPLE, BYTE_RATE, BLOCK_ALIGN, SAMPLE_DEPTH,  # FMT CHUNK
+    #     DATA_HEADER, DATA_SIZE, DATA  # DATA CHUNK
+    # ]
+
+    PCM_DATA:bytes
+    CHANNELS=2
+    BITS=16
+    SAMPLE=44100
 
     def __init__(self, data: bytes) -> None:
-        duration = len(data)
-        self.DATA_SIZE = duration.to_bytes(4, 'little')
-        self.riff_size = (0x24+duration).to_bytes(4, 'little')
-        self.DATA = data
-        self.BYTESDATA[1] = self.riff_size
-        self.BYTESDATA[12] = self.DATA_SIZE
-        self.BYTESDATA[13] = self.DATA
+        self.PCM_DATA=data
+        # duration = len(data)
+        # self.DATA_SIZE = duration.to_bytes(4, 'little')
+        # self.riff_size = (0x24+duration).to_bytes(4, 'little')
+        # self.DATA = data
+        # self.BYTESDATA[1] = self.riff_size
+        # self.BYTESDATA[12] = self.DATA_SIZE
+        # self.BYTESDATA[13] = self.DATA
 
-    def getBytes(self) -> bytes:
-        return b''.join(self.BYTESDATA)
+    # def getBytes(self) -> bytes:
+    #     return b''.join(self.BYTESDATA)
 
     def save(self, fileName: str) -> None:
-        with open(fileName, 'wb') as fp:
-            fp.write(self.getBytes())
+        wavfile = wave.open(fileName,'wb')
+        wavfile.setnchannels(self.CHANNELS)
+        wavfile.setsampwidth(self.BITS//8)
+        wavfile.setframerate(self.SAMPLE)
+        wavfile.writeframes(self.PCM_DATA)
+        wavfile.close()
+        # with open(fileName, 'wb') as fp:
+        #     fp.write(self.getBytes())
 
 
 # 继承重写配置文件类，使其支持大写。。
@@ -163,6 +176,9 @@ iniMode = True if args.ini else False
 wavMode = True if args.wav else False
 loopMode = True if args.loop else False
 
+print('THBGM-UNPack v1.03.2')
+print('Copyright (c) 2022 zjkwdy.All rights reserved.')
+print()
 # 打开bgm.fmt,初始化
 fmt = thfmt(fmtName)
 # 打开bgm.dat,初始化
