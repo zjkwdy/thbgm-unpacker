@@ -24,16 +24,26 @@ python3 thbgm.py -W
 ##### 可选参数：
 
 ```
-usage: thbgm.py [-h] [-f FMT] [-d DAT] [-l] [-W] [-I]
+$> ./thbgm.py -h
+usage: thbgm.py [-h] [-f FMT] [-d DAT] [-L LOOP] [-l] [-W] [-I]
 
 options:
-  -h, --help         显示这个帮助页然后退出
-  -f FMT, --fmt FMT  thbgm.fmt文件名(路径)
-  -d DAT, --dat DAT  thbgm.dat文件名(路径)
-  -l, --ls           列出fmt内所有bgm
-  -W, --wav          解压wav
-  -I, --ini          生成BgmForAll.ini
+  -h, --help            show this help message and exit
+  -f FMT, --fmt FMT     thbgm.fmt文件名(路径)
+  -d DAT, --dat DAT     thbgm.dat文件名(路径)
+  -L LOOP, --loop LOOP  指定循环部分循环次数
+  -l, --ls              列出fmt内所有bgm
+  -W, --wav             解压wav
+  -I, --ini             生成BgmForAll.ini
 ```
+
+多个参数可以同时使用：
+
+```shell
+./thbgm.py -f th12bgm.fmt -d th12bgm.dat -lWI -L 3
+```
+
+执行后将会显示fmt内指示的所有bgm，并且在本目录下解包出一大堆循环部分循环3次的wav，同时生成`BgmForAll.ini`。
 
 注释都在`thbgm.py`，自己看吧。没什么技术含量。
 

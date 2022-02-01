@@ -150,8 +150,9 @@ class myconf(RawConfigParser):
 arg_parser = ArgumentParser()
 arg_parser.add_argument('-f', '--fmt', help='thbgm.fmt文件名(路径)')
 arg_parser.add_argument('-d', '--dat', help='thbgm.dat文件名(路径)')
+arg_parser.add_argument('-L', '--loop', help='指定循环部分循环次数（WAV模式）',type=int)
 arg_parser.add_argument('-l', '--ls', help='列出fmt内所有bgm',action='store_true')
-arg_parser.add_argument('-W', '--wav', help='解压wav',action='store_true')
+arg_parser.add_argument('-W', '--wav', help='解包wav',action='store_true')
 arg_parser.add_argument('-I', '--ini', help='生成BgmForAll.ini',action='store_true')
 
 args = arg_parser.parse_args()
@@ -160,6 +161,7 @@ datName = args.dat if args.dat else 'thbgm.dat'
 lsMode = True if args.ls else False
 iniMode = True if args.ini else False
 wavMode = True if args.wav else False
+loopMode = True if args.loop else False
 
 # 打开bgm.fmt,初始化
 fmt = thfmt(fmtName)
@@ -191,6 +193,11 @@ for bgm in fmt.bgmList:
         if not lsMode: print(bgm.name)
         dat.seek(bgm.startTime)
         byte = dat.read(bgm.loopDuration)
+        if loopMode and args.loop>1:
+            loopNum=args.loop-1
+            dat.seek(bgm.startTime+bgm.loopSart)#指针移动到循环开始
+            loopBytes=dat.read(bgm.loopDuration-bgm.loopSart)#读入整个循环
+            byte = byte + loopBytes*loopNum
         wav = riff(byte)
         wav.save(bgm.name)
     if iniMode:
@@ -205,3 +212,4 @@ for bgm in fmt.bgmList:
 # 经典无用代码
 fmt.close()
 dat.close()
+if iniMode: iniFile.close()
