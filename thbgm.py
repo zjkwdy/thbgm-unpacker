@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from os.path import exists
+from os.path import exists,getsize
 from io import BufferedReader
 from configparser import RawConfigParser
 from argparse import ArgumentParser
@@ -185,10 +185,12 @@ if iniMode:
     config.write(iniFile)
 
 if lsMode:
+    total=0
     print('Name'.center(15,'-')+'Size'.center(10,'-')+'Offset'.center(13,'-'))
 for bgm in fmt.bgmList:
     if lsMode:
         print(bgm.name.ljust(15),str(hum_convert(bgm.loopDuration)).ljust(10),hex(bgm.startTime).upper().ljust(10).replace('0X','0x'))
+        total+=bgm.loopDuration
     if wavMode:
         if not lsMode: print(bgm.name)
         dat.seek(bgm.startTime)
@@ -208,6 +210,12 @@ for bgm in fmt.bgmList:
         bgm_ini = 'BGM = %s,%s,%s,%s,%s\n' % (bgm.name, sT, lS, x1, x2)
         bgm_ini = bgm_ini.upper().replace('0X', '0x')
         iniFile.write(bgm_ini)
+
+if lsMode:
+    print(''.center(38,'-'))
+    print(f'Total: {hum_convert(total)}, {hum_convert(getsize(dat.name)-total)} Not Used.')
+if dat.dat.tell() > 0:
+    print(f'Read {hum_convert(dat.dat.tell())} From {dat.name} , {hum_convert(getsize(dat.name)-dat.dat.tell())} Remaining.')
 
 # 经典无用代码
 fmt.close()
