@@ -31,9 +31,9 @@ options:
   -h, --help            show this help message and exit
   -f FMT, --fmt FMT     thbgm.fmt文件名(路径)
   -d DAT, --dat DAT     thbgm.dat文件名(路径)
-  -L LOOP, --loop LOOP  指定循环部分循环次数
+  -L LOOP, --loop LOOP  指定循环部分循环次数（WAV模式）
   -l, --ls              列出fmt内所有bgm
-  -W, --wav             解压wav
+  -W, --wav             解包wav
   -I, --ini             生成BgmForAll.ini
 ```
 
