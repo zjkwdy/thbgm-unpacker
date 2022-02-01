@@ -179,7 +179,7 @@ wavMode = True if args.wav else False
 loopMode = True if args.loop else False
 fileMode = True if args.file else False
 
-print('THBGM-UNPack v1.03.2')
+print('THBGM-UNPacker v1.03.2')
 print('Copyright © 2022 zjkwdy.All rights reserved.')
 print()
 # 打开bgm.fmt,初始化

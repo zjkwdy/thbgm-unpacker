@@ -1,4 +1,4 @@
-# THBGM-UNPack
+# THBGM-UNPacker
 
 
 ![license](https://img.shields.io/github/license/zjkwdy/thbgm-unpack)     ![pyver](https://img.shields.io/badge/python-3.7+-green)
