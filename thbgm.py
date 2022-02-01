@@ -177,7 +177,7 @@ wavMode = True if args.wav else False
 loopMode = True if args.loop else False
 
 print('THBGM-UNPack v1.03.2')
-print('Copyright (c) 2022 zjkwdy.All rights reserved.')
+print('Copyright © 2022 zjkwdy.All rights reserved.')
 print()
 # 打开bgm.fmt,初始化
 fmt = thfmt(fmtName)
