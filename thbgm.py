@@ -185,7 +185,7 @@ if iniMode:
     config.write(iniFile)
 
 if lsMode:
-    total=0
+    total=fmt.bgmList[0].startTime
     print('Name'.center(15,'-')+'Size'.center(10,'-')+'Offset'.center(13,'-'))
 for bgm in fmt.bgmList:
     if lsMode:
