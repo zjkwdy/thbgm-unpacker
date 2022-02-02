@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-from os.path import exists,getsize
+from os.path import exists, getsize
 from io import BufferedReader
 from configparser import RawConfigParser
 from argparse import ArgumentParser
-from pyaudio import PyAudio
 import wave
 
 T_Bgm = dict[str, int]
 
-#将字节数转为MB等单位
+
+
+# 将字节数转为MB等单位
 def hum_convert(value):
     units = ["B", "KB", "MB", "GB", "TB", "PB"]
     size = 1024.0
@@ -16,6 +17,8 @@ def hum_convert(value):
         if (value / size) < 1:
             return "%.2f%s" % (value, units[i])
         value = value / size
+
+
 
 # 单首bgm的类型
 class thbgm:
@@ -39,6 +42,8 @@ class thbgm:
         self.channels = bgm['channels']
         self.sample = bgm['sample']
         self.bits = bgm['bits']
+
+
 
 # thbgm.fmt处理类
 class thfmt:
@@ -67,9 +72,9 @@ class thfmt:
                 duration = int.from_bytes(bgm[20:24], 'little')  # bgm时长
                 loopStart = int.from_bytes(bgm[24:28], 'little')  # 循环节开始
                 loopDuration = int.from_bytes(bgm[28:32], 'little')  # 循环长度
-                channles = int.from_bytes(bgm[34:36], 'little') # 声道数
-                sample = int.from_bytes(bgm[36:40], 'little') # 采样率
-                bits = int.from_bytes(bgm[46:48], 'little') # 采样位数
+                channles = int.from_bytes(bgm[34:36], 'little')  # 声道数
+                sample = int.from_bytes(bgm[36:40], 'little')  # 采样率
+                bits = int.from_bytes(bgm[46:48], 'little')  # 采样位数
                 bgm = {
                     'name': fileName,
                     'duration': duration,
@@ -85,6 +90,8 @@ class thfmt:
 
     def close(self) -> None:
         self.fmt.close()
+
+
 
 # thbgm.dat处理类
 class bgmdat:
@@ -157,7 +164,7 @@ class riff:
     #     return b''.join(self.BYTESDATA)
 
     def save(self, fileName: str) -> None:
-        wavfile = wave.open(fileName,'wb')
+        wavfile = wave.open(fileName, 'wb')
         wavfile.setnchannels(self.CHANNELS)
         wavfile.setsampwidth(self.BITS//8)
         wavfile.setframerate(self.SAMPLE)
@@ -185,6 +192,7 @@ arg_parser.add_argument('-l', '--ls', help='列出fmt内所有bgm', action='stor
 arg_parser.add_argument('-W', '--wav', help='解包wav', action='store_true')
 arg_parser.add_argument('-I', '--ini', help='生成BgmForAll.ini', action='store_true')
 
+# 狗屎代码要来力！
 args = arg_parser.parse_args()
 fmtName = args.fmt if args.fmt else 'thbgm.fmt'
 datName = args.dat if args.dat else 'thbgm.dat'
@@ -219,26 +227,37 @@ if iniMode:
     config.write(iniFile)
 
 if lsMode:
-    total=fmt.bgmList[0].startTime
-    print('Name'.center(15,'-')+'Size'.center(10,'-')+'Offset'.center(13,'-'))
+    total = fmt.bgmList[0].startTime # 总量初始值为第一首bgm的起始点
+    print(
+        'Name'.center(15, '-')+
+        'Size'.center(10, '-')+
+        'Offset'.center(13, '-')
+    )
 for bgm in fmt.bgmList:
-    if fileMode and (bgm.name not in args.file): continue
+    if fileMode and (bgm.name not in args.file):
+        continue
     if lsMode:
-        print(bgm.name.ljust(15),str(hum_convert(bgm.loopDuration)).ljust(10),hex(bgm.startTime).upper().ljust(10).replace('0X','0x'))
-        total+=bgm.loopDuration
+        print(
+            bgm.name.ljust(15), 
+            str(hum_convert(bgm.loopDuration)).ljust(10), 
+            hex(bgm.startTime).upper().ljust(10).replace('0X', '0x')
+        )
+        total += bgm.loopDuration
     if wavMode:
-        if not lsMode: print(bgm.name)
-        dat.seek(bgm.startTime)
-        byte = dat.read(bgm.loopDuration)
-        if loopMode and args.loop>1:
-            loopNum=args.loop-1
-            dat.seek(bgm.startTime+bgm.loopSart)#指针移动到循环开始
-            loopBytes=dat.read(bgm.loopDuration-bgm.loopSart)#读入整个循环
+        if not lsMode:
+            print(bgm.name) # 如果还用了-l开关就不重复显示
+        dat.seek(bgm.startTime) # 指针移动到bgm起始点
+        byte = dat.read(bgm.loopDuration) # 读入整首bgm
+        if loopMode and args.loop > 1:
+            loopNum = args.loop-1
+            dat.seek(bgm.startTime+bgm.loopSart)  # 指针移动到循环开始
+            loopBytes = dat.read(bgm.loopDuration-bgm.loopSart)  # 读入整个循环
             byte = byte + loopBytes*loopNum
         wav = riff(byte, bgm.channels, bgm.sample, bgm.bits)
         wav.save(bgm.name)
     if iniMode:
-        if not lsMode: print(bgm.name)
+        if not lsMode:
+            print(bgm.name)
         sT = hex(bgm.startTime)
         lS = hex(bgm.loopSart)
         x1 = hex(bgm.startTime+bgm.loopSart)
@@ -248,12 +267,13 @@ for bgm in fmt.bgmList:
         iniFile.write(bgm_ini)
 
 if lsMode:
-    print(''.center(38,'-'))
+    print(''.center(38, '-'))
     print(f'Total: {hum_convert(total)}, {hum_convert(getsize(dat.name)-total)} Not Used.')
 if dat.dat.tell() > 0:
-    print(f'Read {hum_convert(dat.dat.tell())} From {dat.name} , {hum_convert(getsize(dat.name)-dat.dat.tell())} Remaining.')
+    print(f'Process {hum_convert(dat.dat.tell())}, {hum_convert(getsize(dat.name)-dat.dat.tell())} Remaining.')
 
 # 经典无用代码
 fmt.close()
 dat.close()
-if iniMode: iniFile.close()
+if iniMode:
+    iniFile.close()
