@@ -6,7 +6,7 @@
 
 一个用来提取东方正作bgm的脚本，顺便可以生成`BgmForAll.ini`。懒得测试那么多了，目前就测试了
 
-th07-妖妖梦、th08-永夜抄、th12-星莲船、th14-辉针城
+th07-妖妖梦、th08-永夜抄、th12-星莲船、th14-辉针城。理论上不支持th13,因为据传灵界bgm会变速变调变采样率等等。
 
 ### Useage
 
@@ -46,7 +46,7 @@ options:
 ./thbgm.py -f th12bgm.fmt -d th12bgm.dat -W
 ```
 
-列出`th12bgm.fmt`和`th12bgm.dat`内的文件
+列出`thbgm.fmt`和`thbgm.dat`内的文件
 
 ```shell
 ./thbgm.py -l
