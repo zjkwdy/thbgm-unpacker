@@ -26,6 +26,9 @@ class thbgm:
     duration: int
     loopSart: int
     loopDuration: int
+    channels: int
+    sample: int
+    bits: int
 
     def __init__(self, bgm: T_Bgm) -> None:
         self.name = bgm['name']
@@ -33,6 +36,9 @@ class thbgm:
         self.startTime = bgm['startTime']
         self.loopSart = bgm['loopStart']
         self.loopDuration = bgm['loopDuration']
+        self.channels = bgm['channels']
+        self.sample = bgm['sample']
+        self.bits = bgm['bits']
 
 # thbgm.fmt处理类
 class thfmt:
@@ -61,12 +67,18 @@ class thfmt:
                 duration = int.from_bytes(bgm[20:24], 'little')  # bgm时长
                 loopStart = int.from_bytes(bgm[24:28], 'little')  # 循环节开始
                 loopDuration = int.from_bytes(bgm[28:32], 'little')  # 循环长度
+                channles = int.from_bytes(bgm[34:36], 'little') # 声道数
+                sample = int.from_bytes(bgm[36:40], 'little') # 采样率
+                bits = int.from_bytes(bgm[46:48], 'little') # 采样位数
                 bgm = {
                     'name': fileName,
                     'duration': duration,
                     'startTime': startTime,
                     'loopStart': loopStart,
-                    'loopDuration': loopDuration
+                    'loopDuration': loopDuration,
+                    'channels': channles,
+                    'sample': sample,
+                    'bits': bits
                 }
                 bgmList.append(thbgm(bgm))
         self.bgmList = bgmList
@@ -123,13 +135,16 @@ class riff:
     #     DATA_HEADER, DATA_SIZE, DATA  # DATA CHUNK
     # ]
 
-    PCM_DATA:bytes
-    CHANNELS=2
-    BITS=16
-    SAMPLE=44100
+    PCM_DATA: bytes
+    CHANNELS: int
+    BITS: int
+    SAMPLE: int
 
-    def __init__(self, data: bytes) -> None:
-        self.PCM_DATA=data
+    def __init__(self, data: bytes, channels=2, sample=44100, bits=16) -> None:
+        self.PCM_DATA = data
+        self.CHANNELS = channels
+        self.SAMPLE = sample
+        self.BITS = bits
         # duration = len(data)
         # self.DATA_SIZE = duration.to_bytes(4, 'little')
         # self.riff_size = (0x24+duration).to_bytes(4, 'little')
@@ -179,8 +194,8 @@ wavMode = True if args.wav else False
 loopMode = True if args.loop else False
 fileMode = True if args.file else False
 
-print('THBGM-UNPacker v1.03.2')
-print('Copyright © 2022 zjkwdy.All rights reserved.')
+print('THBGM-UNPacker v1.03.5')
+print('Copyright © 2022 zjkwdy. All rights reserved.')
 print()
 # 打开bgm.fmt,初始化
 fmt = thfmt(fmtName)
@@ -220,7 +235,7 @@ for bgm in fmt.bgmList:
             dat.seek(bgm.startTime+bgm.loopSart)#指针移动到循环开始
             loopBytes=dat.read(bgm.loopDuration-bgm.loopSart)#读入整个循环
             byte = byte + loopBytes*loopNum
-        wav = riff(byte)
+        wav = riff(byte, bgm.channels, bgm.sample, bgm.bits)
         wav.save(bgm.name)
     if iniMode:
         if not lsMode: print(bgm.name)
