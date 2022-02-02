@@ -1,7 +1,7 @@
 # THBGM-UNPacker
 
 
-![license](https://img.shields.io/github/license/zjkwdy/thbgm-unpack)     ![pyver](https://img.shields.io/badge/python-3.7+-green)
+![license](https://img.shields.io/github/license/zjkwdy/thbgm-unpack)	![pyver](https://img.shields.io/badge/python-3.7+-green)    [![State-of-the-art Shitcode](https://img.shields.io/static/v1?label=State-of-the-art&message=Shitcode&color=7B5804)](https://github.com/trekhleb/state-of-the-art-shitcode)
 
 
 一个用来提取东方正作bgm的脚本，顺便可以生成`BgmForAll.ini`。懒得测试那么多了，目前就测试了
