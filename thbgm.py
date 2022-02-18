@@ -160,6 +160,9 @@ class riff:
         # self.BYTESDATA[12] = self.DATA_SIZE
         # self.BYTESDATA[13] = self.DATA
 
+    def write(self,bytesData:bytes):
+        self.PCM_DATA += bytesData
+
     # def getBytes(self) -> bytes:
     #     return b''.join(self.BYTESDATA)
 
@@ -248,12 +251,13 @@ for bgm in fmt.bgmList:
             print(bgm.name) # 如果还用了-l开关就不重复显示
         dat.seek(bgm.startTime) # 指针移动到bgm起始点
         byte = dat.read(bgm.loopDuration) # 读入整首bgm
+        wav = riff(byte, bgm.channels, bgm.sample, bgm.bits)
         if loopMode and args.loop > 1:
             loopNum = args.loop-1
             dat.seek(bgm.startTime+bgm.loopSart)  # 指针移动到循环开始
             loopBytes = dat.read(bgm.loopDuration-bgm.loopSart)  # 读入整个循环
-            byte = byte + loopBytes*loopNum
-        wav = riff(byte, bgm.channels, bgm.sample, bgm.bits)
+            for _ in range(loopNum):
+                wav.write(loopBytes)
         wav.save(bgm.name)
     if iniMode:
         if not lsMode:
