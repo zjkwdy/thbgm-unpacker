@@ -142,16 +142,25 @@ class riff:
     #     DATA_HEADER, DATA_SIZE, DATA  # DATA CHUNK
     # ]
 
+    FILE_NAME: str
     PCM_DATA: bytes
     CHANNELS: int
     BITS: int
     SAMPLE: int
+    _WAV_FILE: wave.Wave_write
 
-    def __init__(self, data: bytes, channels=2, sample=44100, bits=16) -> None:
+    def __init__(self, fileName: str, data: bytes, channels=2, sample=44100, bits=16) -> None:
+        self.FILE_NAME = fileName
         self.PCM_DATA = data
         self.CHANNELS = channels
         self.SAMPLE = sample
         self.BITS = bits
+        self._WAV_FILE = wave.open(fileName, 'wb')
+        self._WAV_FILE.setnchannels(channels)
+        self._WAV_FILE.setsampwidth(bits//8)
+        self._WAV_FILE.setframerate(sample)
+        self._WAV_FILE.writeframes(data)
+        
         # duration = len(data)
         # self.DATA_SIZE = duration.to_bytes(4, 'little')
         # self.riff_size = (0x24+duration).to_bytes(4, 'little')
@@ -160,19 +169,15 @@ class riff:
         # self.BYTESDATA[12] = self.DATA_SIZE
         # self.BYTESDATA[13] = self.DATA
 
-    def write(self,bytesData:bytes):
-        self.PCM_DATA += bytesData
+    def write(self,bytesData: bytes) -> None:
+        self._WAV_FILE.writeframes(bytesData)
 
     # def getBytes(self) -> bytes:
     #     return b''.join(self.BYTESDATA)
 
-    def save(self, fileName: str) -> None:
-        wavfile = wave.open(fileName, 'wb')
-        wavfile.setnchannels(self.CHANNELS)
-        wavfile.setsampwidth(self.BITS//8)
-        wavfile.setframerate(self.SAMPLE)
-        wavfile.writeframes(self.PCM_DATA)
-        wavfile.close()
+    # def save(self, fileName: str) -> None:
+        
+    #     wavfile.close()
         # with open(fileName, 'wb') as fp:
         #     fp.write(self.getBytes())
 
@@ -251,14 +256,13 @@ for bgm in fmt.bgmList:
             print(bgm.name) # 如果还用了-l开关就不重复显示
         dat.seek(bgm.startTime) # 指针移动到bgm起始点
         byte = dat.read(bgm.loopDuration) # 读入整首bgm
-        wav = riff(byte, bgm.channels, bgm.sample, bgm.bits)
+        wav = riff(bgm.name, byte, bgm.channels, bgm.sample, bgm.bits)
         if loopMode and args.loop > 1:
             loopNum = args.loop-1
             dat.seek(bgm.startTime+bgm.loopSart)  # 指针移动到循环开始
             loopBytes = dat.read(bgm.loopDuration-bgm.loopSart)  # 读入整个循环
             for _ in range(loopNum):
                 wav.write(loopBytes)
-        wav.save(bgm.name)
     if iniMode:
         if not lsMode:
             print(bgm.name)
