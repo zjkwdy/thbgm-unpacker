@@ -23,7 +23,7 @@ def hum_convert(value):
 # 单首bgm的类型
 class thbgm:
     # 定义见#45
-    bgm: T_Bgm
+    # bgm: T_Bgm
     name: str
     startTime: int
     duration: int
