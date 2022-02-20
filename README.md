@@ -61,7 +61,7 @@ options:
 指定循环部分循环次数：
 
 ```shell
-./thbgm.py -L 3
+./thbgm.py -W -L 3
 ```
 
 多个参数可以同时使用：
