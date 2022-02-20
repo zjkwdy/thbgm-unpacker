@@ -143,7 +143,7 @@ class riff:
     # ]
 
     FILE_NAME: str
-    PCM_DATA: bytes
+    # PCM_DATA: bytes
     CHANNELS: int
     BITS: int
     SAMPLE: int
@@ -151,7 +151,7 @@ class riff:
 
     def __init__(self, fileName: str, data: bytes, channels=2, sample=44100, bits=16) -> None:
         self.FILE_NAME = fileName
-        self.PCM_DATA = data
+        # self.PCM_DATA = data
         self.CHANNELS = channels
         self.SAMPLE = sample
         self.BITS = bits
