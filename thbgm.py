@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from chardet import detect
 from os.path import exists, getsize
 from io import BufferedReader
 from configparser import RawConfigParser
@@ -183,6 +184,51 @@ class riff:
         # with open(fileName, 'wb') as fp:
         #     fp.write(self.getBytes())
 
+class bgmcmt:
+    wav: str
+    name: str
+    desc: str
+
+    def __init__(self, name: str, desc: str, wav: str) -> None:
+        self.name = name
+        self.desc = desc
+        self.wav = wav
+
+
+class musiccmt:
+
+    encoding: str
+    cmtList: dict[str,bgmcmt]
+    _cmt_bytes: bytes
+
+    def __init__(self, fileName: str) -> None:
+        f = open(fileName, 'rb')
+        cmt_bytes = f.read()
+        self._cmt_bytes = cmt_bytes
+        encoding = self.get_encoding(cmt_bytes)
+        cmtStr = cmt_bytes.decode(encoding)
+        self.cmtList=self.from_str(cmtStr)
+        f.close()
+
+    @staticmethod
+    def get_encoding(byt: bytes) -> str:
+        return detect(byt)['encoding']
+
+    @staticmethod
+    def from_str(cmtStr: str) -> dict[str,bgmcmt]:
+        cmtStrList = cmtStr.split('@bgm/')[1:-1]  # 抛弃前段注释
+        tmp: dict[str,bgmcmt]={}
+        for bcmt in cmtStrList:
+            bgm = bcmt.splitlines()
+            bgm_wav = bgm[0]
+            bgm_name = bgm[1]
+            bgm_desc = '\n'.join(bgm[4:-1])
+            cmt = bgmcmt(bgm_name, bgm_desc, bgm_wav)
+            tmp[bgm_wav]=cmt
+        return tmp
+
+    def getCmt(self,wavName: str) -> bgmcmt:
+        return self.cmtList[wavName] if wavName in self.cmtList else bgmcmt(wavName,'',wavName)
 
 # 继承重写配置文件类，使其支持大写。。
 class myconf(RawConfigParser):
@@ -196,6 +242,7 @@ class myconf(RawConfigParser):
 arg_parser = ArgumentParser()
 arg_parser.add_argument('-f', '--fmt', help='thbgm.fmt文件名(路径)', metavar='File')
 arg_parser.add_argument('-d', '--dat', help='thbgm.dat文件名(路径)', metavar='File')
+arg_parser.add_argument('-c', '--cmt', help='musiccmt.txt文件名(路径)(可选)', metavar='File')
 arg_parser.add_argument('-F', '--file', help='解包指定的文件', nargs='+', metavar='File')
 arg_parser.add_argument('-L', '--loop', help='指定循环部分循环次数（WAV模式）', type=int, metavar='Number')
 arg_parser.add_argument('-l', '--ls', help='列出fmt内所有bgm', action='store_true')
@@ -206,6 +253,8 @@ arg_parser.add_argument('-I', '--ini', help='生成BgmForAll.ini', action='store
 args = arg_parser.parse_args()
 fmtName = args.fmt if args.fmt else 'thbgm.fmt'
 datName = args.dat if args.dat else 'thbgm.dat'
+cmtMode = True if args.cmt else False
+if cmtMode: cmtName=args.cmt
 lsMode = True if args.ls else False
 iniMode = True if args.ini else False
 wavMode = True if args.wav else False
@@ -219,6 +268,9 @@ print()
 fmt = thfmt(fmtName)
 # 打开bgm.dat,初始化
 dat = bgmdat(datName)
+# 打开musiccmt文件，初始化
+if cmtMode: cmt = musiccmt(cmtName)
+
 if iniMode:
     # 初始化ini
     config = myconf()
@@ -238,27 +290,32 @@ if iniMode:
 
 if lsMode:
     total = fmt.bgmList[0].startTime # 总量初始值为第一首bgm的起始点
+    title='Title'.center(50, '-') if cmtMode else ''
     print(
         'Name'.center(15, '-')+
+        title+
         'Size'.center(10, '-')+
         'Offset'.center(13, '-')
     )
 for bgm in fmt.bgmList:
     if fileMode and (bgm.name not in args.file):
         continue
+    name=cmt.getCmt(bgm.name).name.encode('utf-8').decode() if cmtMode else bgm.name
     if lsMode:
+        title=cmt.getCmt(bgm.name).name.ljust(50) if cmtMode else ''
         print(
-            bgm.name.ljust(15), 
-            str(hum_convert(bgm.loopDuration)).ljust(10), 
+            bgm.name.ljust(15)+
+            title+
+            str(hum_convert(bgm.loopDuration)).ljust(10)+
             hex(bgm.startTime).upper().ljust(10).replace('0X', '0x')
         )
         total += bgm.loopDuration
     if wavMode:
         if not lsMode:
-            print(bgm.name) # 如果还用了-l开关就不重复显示
+            print(name,bgm.name) # 如果还用了-l开关就不重复显示
         dat.seek(bgm.startTime) # 指针移动到bgm起始点
         byte = dat.read(bgm.loopDuration) # 读入整首bgm
-        wav = riff(bgm.name, byte, bgm.channels, bgm.sample, bgm.bits)
+        wav = riff(name, byte, bgm.channels, bgm.sample, bgm.bits)
         if loopMode and args.loop > 1:
             loopNum = args.loop-1
             dat.seek(bgm.startTime+bgm.loopSart)  # 指针移动到循环开始
@@ -268,12 +325,12 @@ for bgm in fmt.bgmList:
         wav.close()
     if iniMode:
         if not lsMode:
-            print(bgm.name)
+            print(name,bgm.name)
         sT = hex(bgm.startTime)
         lS = hex(bgm.loopSart)
         x1 = hex(bgm.startTime+bgm.loopSart)
         x2 = hex(bgm.loopDuration-bgm.loopSart)
-        bgm_ini = 'BGM = %s,%s,%s,%s,%s\n' % (bgm.name, sT, lS, x1, x2)
+        bgm_ini = 'BGM = %s,%s,%s,%s,%s\n' % (name, sT, lS, x1, x2)
         bgm_ini = bgm_ini.upper().replace('0X', '0x')
         iniFile.write(bgm_ini)
 
