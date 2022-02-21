@@ -172,6 +172,8 @@ class riff:
     def write(self,bytesData: bytes) -> None:
         self._WAV_FILE.writeframes(bytesData)
 
+    def close(self) -> None:
+        self._WAV_FILE.close()
     # def getBytes(self) -> bytes:
     #     return b''.join(self.BYTESDATA)
 
@@ -263,6 +265,7 @@ for bgm in fmt.bgmList:
             loopBytes = dat.read(bgm.loopDuration-bgm.loopSart)  # 读入整个循环
             for _ in range(loopNum):
                 wav.write(loopBytes)
+        wav.close()
     if iniMode:
         if not lsMode:
             print(bgm.name)
