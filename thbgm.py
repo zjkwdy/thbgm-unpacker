@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from chardet import detect
 from os.path import exists, getsize, splitext
 from io import BufferedReader
 from configparser import RawConfigParser
@@ -33,9 +32,11 @@ class thbgm:
     channels: int
     sample: int
     bits: int
+    format: str
 
     def __init__(self, bgm: T_Bgm) -> None:
         self.name = bgm['name']
+        self.format = splitext(self.name)[-1]
         self.duration = bgm['duration']
         self.startTime = bgm['startTime']
         self.loopSart = bgm['loopStart']
@@ -212,14 +213,20 @@ class musiccmt:
         try:
             cmtStr = cmt_bytes.decode(encoding)
         except Exception:
-            print(f'尝试使用{encoding} 解码{fileName}失败，请使用--encoding手动指定cmt文件编码方式。(日文原版一般为 shift-jis，汉化版可能是gbk等)')
-            exit(1)
+            raise Exception(f'尝试使用{encoding}解码{fileName}失败，请换一种编码方式或检查输入文件是否正确，然后重试。')
         self.cmtList=self.from_str(cmtStr)
         f.close()
 
     @staticmethod
     def get_encoding(byt: bytes) -> str:    #自动猜测文件编码
-        return detect(byt)['encoding']
+        encodings=['shift-jis','gb2312','gb18030','gbk','utf-8'] #常见编码，欢迎补充
+        for encoding in encodings:
+            try:
+                byt.decode(encoding)
+                return encoding
+            except UnicodeDecodeError:
+                pass
+        raise Exception('尝试自动解码musiccmt失败，请使用--encoding手动指定cmt文件编码方式。')
 
     @staticmethod
     def from_str(cmtStr: str) -> dict[str,bgmcmt]:
@@ -325,7 +332,7 @@ for bgm in fmt.bgmList:
             print(name) # 如果还用了-l开关就不重复显示
         dat.seek(bgm.startTime) # 指针移动到bgm起始点
         byte = dat.read(bgm.loopDuration) # 读入整首bgm
-        wav = riff(name, byte, bgm.channels, bgm.sample, bgm.bits)
+        wav = riff(name+bgm.format, byte, bgm.channels, bgm.sample, bgm.bits)
         if loopMode and args.loop > 1:
             loopNum = args.loop-1
             dat.seek(bgm.startTime+bgm.loopSart)  # 指针移动到循环开始
