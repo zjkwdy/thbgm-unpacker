@@ -212,7 +212,7 @@ class musiccmt:
         try:
             cmtStr = cmt_bytes.decode(encoding)
         except Exception:
-            print(f'尝试使用{encoding} 解码{fileName}失败，请使用--encoding手动指定cmt文件编码方式。(日文原版一般为 shift-jis，汉化版可能是gb2312、gb18030、gbk等)')
+            print(f'尝试使用{encoding} 解码{fileName}失败，请使用--encoding手动指定cmt文件编码方式。(日文原版一般为 shift-jis，汉化版可能是gbk等)')
             exit(1)
         self.cmtList=self.from_str(cmtStr)
         f.close()
@@ -251,7 +251,7 @@ arg_parser = ArgumentParser()
 arg_parser.add_argument('-f', '--fmt', help='thbgm.fmt文件名(路径)', metavar='File')
 arg_parser.add_argument('-d', '--dat', help='thbgm.dat文件名(路径)', metavar='File')
 arg_parser.add_argument('-c', '--cmt', help='musiccmt.txt文件名(路径)(可选)', metavar='File')
-arg_parser.add_argument('--encoding', help='指定musiccmt.txt的编码(可选)', metavar='Encoding')
+arg_parser.add_argument('--encoding', help='指定musiccmt.txt的编码(可选)', metavar='Encoding | auto')
 arg_parser.add_argument('-F', '--file', help='解包指定的文件', nargs='+', metavar='File')
 arg_parser.add_argument('-L', '--loop', help='指定循环部分循环次数（WAV模式）', type=int, metavar='Number')
 arg_parser.add_argument('-l', '--ls', help='列出fmt内所有bgm', action='store_true')
