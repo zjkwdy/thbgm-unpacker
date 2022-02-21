@@ -343,12 +343,12 @@ for bgm in fmt.bgmList:
     if iniMode:
         if not lsMode:
             print(name)
-        sT = hex(bgm.startTime)
-        lS = hex(bgm.loopSart)
-        x1 = hex(bgm.startTime+bgm.loopSart)
-        x2 = hex(bgm.loopDuration-bgm.loopSart)
+        sT = hex(bgm.startTime).upper()
+        lS = hex(bgm.loopSart).upper()
+        x1 = hex(bgm.startTime+bgm.loopSart).upper()
+        x2 = hex(bgm.loopDuration-bgm.loopSart).upper()
         bgm_ini = 'BGM = %s,%s,%s,%s,%s\n' % (name, sT, lS, x1, x2)
-        bgm_ini = bgm_ini.upper().replace('0X', '0x')
+        bgm_ini = bgm_ini.replace('0X', '0x')
         iniFile.write(bgm_ini)
 
 if lsMode:
