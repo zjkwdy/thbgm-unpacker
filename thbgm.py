@@ -201,11 +201,12 @@ class musiccmt:
     cmtList: dict[str,bgmcmt]
     _cmt_bytes: bytes
 
-    def __init__(self, fileName: str) -> None:
+    def __init__(self, fileName: str,encoding: str) -> None:
         f = open(fileName, 'rb')
         cmt_bytes = f.read()
         self._cmt_bytes = cmt_bytes
-        encoding = self.get_encoding(cmt_bytes)
+        if encoding=='auto':
+            encoding = self.get_encoding(cmt_bytes)
         cmtStr = cmt_bytes.decode(encoding)
         self.cmtList=self.from_str(cmtStr)
         f.close()
@@ -244,6 +245,7 @@ arg_parser = ArgumentParser()
 arg_parser.add_argument('-f', '--fmt', help='thbgm.fmt文件名(路径)', metavar='File')
 arg_parser.add_argument('-d', '--dat', help='thbgm.dat文件名(路径)', metavar='File')
 arg_parser.add_argument('-c', '--cmt', help='musiccmt.txt文件名(路径)(可选)', metavar='File')
+arg_parser.add_argument('--encoding', help='指定musiccmt.txt的编码(可选)', metavar='Encoding')
 arg_parser.add_argument('-F', '--file', help='解包指定的文件', nargs='+', metavar='File')
 arg_parser.add_argument('-L', '--loop', help='指定循环部分循环次数（WAV模式）', type=int, metavar='Number')
 arg_parser.add_argument('-l', '--ls', help='列出fmt内所有bgm', action='store_true')
@@ -256,6 +258,7 @@ fmtName = args.fmt if args.fmt else 'thbgm.fmt'
 datName = args.dat if args.dat else 'thbgm.dat'
 cmtMode = True if args.cmt else False
 if cmtMode: cmtName=args.cmt
+cmt_encoding = args.encoding if args.encoding else 'auto'
 lsMode = True if args.ls else False
 iniMode = True if args.ini else False
 wavMode = True if args.wav else False
@@ -270,7 +273,7 @@ fmt = thfmt(fmtName)
 # 打开bgm.dat,初始化
 dat = bgmdat(datName)
 # 打开musiccmt文件，初始化
-if cmtMode: cmt = musiccmt(cmtName)
+if cmtMode: cmt = musiccmt(cmtName,cmt_encoding)
 
 if iniMode:
     # 初始化ini

@@ -25,13 +25,14 @@ python3 thbgm.py -W
 
 ```
 $> ./thbgm.py -h
-usage: thbgm [-h] [-f File] [-d File] [-c File] [-F File [File ...]] [-L Number] [-l] [-W] [-I]
+usage: thbgm [-h] [-f File] [-d File] [-c File] [--encoding Encoding] [-F File [File ...]] [-L Number] [-l] [-W] [-I]
 
 options:
   -h, --help            show this help message and exit
   -f File, --fmt File   thbgm.fmt文件名(路径)
   -d File, --dat File   thbgm.dat文件名(路径)
   -c File, --cmt File   musiccmt.txt文件名(路径)(可选)
+  --encoding Encoding   指定musiccmt.txt的编码(可选)
   -F File [File ...], --file File [File ...] 解包指定的文件
   -L Number, --loop Number 指定循环部分循环次数（WAV模式）
   -l, --ls              列出fmt内所有bgm
