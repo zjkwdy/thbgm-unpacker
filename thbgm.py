@@ -294,7 +294,7 @@ if iniMode:
     config.set('THBGM', 'CHANNEL', '2')
     # 16bit位宽
     config.set('THBGM', 'BIT', '16')
-    iniFile = open('BgmForAll.ini', 'w+',encoding='gb2312',errors='ignore')
+    iniFile = open('BgmForAll.ini', 'w+',encoding='gbk',errors='ignore')
     # 写入死参数
     config.write(iniFile)
 
