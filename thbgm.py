@@ -290,7 +290,7 @@ if iniMode:
 
 if lsMode:
     total = fmt.bgmList[0].startTime # 总量初始值为第一首bgm的起始点
-    title='Title'.center(50, '-') if cmtMode else ''
+    title='Title'.center(60, '-') if cmtMode else ''
     print(
         'Name'.center(15, '-')+
         title+
@@ -312,7 +312,7 @@ for bgm in fmt.bgmList:
         total += bgm.loopDuration
     if wavMode:
         if not lsMode:
-            print(name,bgm.name) # 如果还用了-l开关就不重复显示
+            print(name) # 如果还用了-l开关就不重复显示
         dat.seek(bgm.startTime) # 指针移动到bgm起始点
         byte = dat.read(bgm.loopDuration) # 读入整首bgm
         wav = riff(name, byte, bgm.channels, bgm.sample, bgm.bits)
@@ -325,7 +325,7 @@ for bgm in fmt.bgmList:
         wav.close()
     if iniMode:
         if not lsMode:
-            print(name,bgm.name)
+            print(name)
         sT = hex(bgm.startTime)
         lS = hex(bgm.loopSart)
         x1 = hex(bgm.startTime+bgm.loopSart)
@@ -335,7 +335,7 @@ for bgm in fmt.bgmList:
         iniFile.write(bgm_ini)
 
 if lsMode:
-    print(''.center(38, '-'))
+    print(''.center(38+60 if cmtMode else 38, '-'))
     print(f'Total: {hum_convert(total)}, {hum_convert(getsize(dat.name)-total)} Not Used.')
 if dat.dat.tell() > 0:
     print(f'Process {hum_convert(dat.dat.tell())}, {hum_convert(getsize(dat.name)-dat.dat.tell())} Remaining.')
