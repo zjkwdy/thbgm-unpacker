@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from chardet import detect
-from os.path import exists, getsize
+from os.path import exists, getsize, splitext
 from io import BufferedReader
 from configparser import RawConfigParser
 from argparse import ArgumentParser
@@ -216,18 +216,19 @@ class musiccmt:
 
     @staticmethod
     def from_str(cmtStr: str) -> dict[str,bgmcmt]:
-        cmtStrList = cmtStr.split('@bgm/')[1:-1]  # 抛弃前段注释
+        cmtStrList = cmtStr.split('@bgm/')[1:]  # 抛弃前段注释
         tmp: dict[str,bgmcmt]={}
         for bcmt in cmtStrList:
             bgm = bcmt.splitlines()
-            bgm_wav = bgm[0]
+            bgm_wav = splitext(bgm[0])[0]
             bgm_name = bgm[1]
-            bgm_desc = '\n'.join(bgm[4:-1])
+            bgm_desc = '\n'.join(bgm[4:])
             cmt = bgmcmt(bgm_name, bgm_desc, bgm_wav)
             tmp[bgm_wav]=cmt
         return tmp
 
     def getCmt(self,wavName: str) -> bgmcmt:
+        wavName=splitext(wavName)[0]
         return self.cmtList[wavName] if wavName in self.cmtList else bgmcmt(wavName,'',wavName)
 
 # 继承重写配置文件类，使其支持大写。。
