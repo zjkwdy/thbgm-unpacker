@@ -202,17 +202,23 @@ class musiccmt:
     _cmt_bytes: bytes
 
     def __init__(self, fileName: str,encoding: str) -> None:
+        if not exists(fileName):
+            raise FileNotFoundError(f'找不到{fileName},退出...')
         f = open(fileName, 'rb')
         cmt_bytes = f.read()
         self._cmt_bytes = cmt_bytes
         if encoding=='auto':
             encoding = self.get_encoding(cmt_bytes)
-        cmtStr = cmt_bytes.decode(encoding)
+        try:
+            cmtStr = cmt_bytes.decode(encoding)
+        except Exception:
+            print(f'尝试使用{encoding} 解码{fileName}失败，请使用--encoding手动指定cmt文件编码方式。(日文原版一般为 shift-jis，汉化版可能是gb2312、gb18030、gbk等)')
+            exit(1)
         self.cmtList=self.from_str(cmtStr)
         f.close()
 
     @staticmethod
-    def get_encoding(byt: bytes) -> str:
+    def get_encoding(byt: bytes) -> str:    #自动猜测文件编码
         return detect(byt)['encoding']
 
     @staticmethod
@@ -265,7 +271,7 @@ wavMode = True if args.wav else False
 loopMode = True if args.loop else False
 fileMode = True if args.file else False
 
-print('THBGM-UNPacker v1.03.5')
+print('THBGM-UNPacker v1.05.5')
 print('Copyright © 2022 zjkwdy. All rights reserved.')
 print()
 # 打开bgm.fmt,初始化
@@ -288,7 +294,7 @@ if iniMode:
     config.set('THBGM', 'CHANNEL', '2')
     # 16bit位宽
     config.set('THBGM', 'BIT', '16')
-    iniFile = open('BgmForAll.ini', 'w+')
+    iniFile = open('BgmForAll.ini', 'w+',encoding='gb2312',errors='ignore')
     # 写入死参数
     config.write(iniFile)
 
