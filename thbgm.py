@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from os.path import exists, getsize, splitext
+from sys import argv
 from io import BufferedReader
 from configparser import RawConfigParser
 from argparse import ArgumentParser
@@ -277,6 +278,16 @@ iniMode = True if args.ini else False
 wavMode = True if args.wav else False
 loopMode = True if args.loop else False
 fileMode = True if args.file else False
+
+if len(argv)==1:
+    arg_parser.print_help()
+    exit(1)
+
+if (not lsMode) and (not iniMode) and (not wavMode):
+    arg_parser.print_help()
+    print()
+    print('请指定一个操作(wav、ini、ls)')
+    exit(1)
 
 print('THBGM-UNPacker v1.05.5')
 print('Copyright © 2022 zjkwdy. All rights reserved.')
